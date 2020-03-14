@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Collections;
 
 namespace AdminUniv_1
 {
@@ -72,12 +73,12 @@ namespace AdminUniv_1
         private static void connect()
         {
             try
-            {                
-                
+            {
+
                 //Abre la conexión
                 //System.out.println("Conectando a la Base de Datos...");
                 DBManager.conn = new MySqlConnection("server = localhost; user id = root; database=tecvegetal; password=");
-                conn.Open();                
+                conn.Open();
 
             }
             catch (Exception e)
@@ -128,11 +129,115 @@ namespace AdminUniv_1
                 se.GetBaseException();
             }//end finally try
         }
+    }
+
+    public class Controller
+    {
+        private Controller controller;
+
+        public Controller()
+        {
+
+        }
+
+        Controller getInstance()
+        {
+            if (controller == null)
+            {
+                controller = new Controller();
+            }
+            return controller;
+        }
 
 
+    }
 
+    public class Course
+    {
+        private String ID;
+        private String name;
+        private int credits;
+    }
+
+    public class Carreer
+    {
+        private String ID;
+        private String name;
+
+    }
+
+    public abstract class User
+    {
+        protected String ID { get; set; }
+        protected String name { get; set; }
+        protected String email { get; set; }
+        protected String password { get; set; }
+        protected ArrayList groups;
+
+        public User() { }
+
+        public User(String ID, String name, String email, String password) {
+            this.ID = ID;
+            this.name = name;
+            this.email = email;
+            this.password = password;
+            groups = new ArrayList();
+        }
 
 
 
     }
+
+    public class Student : User 
+    {
+
+        public Student(String ID, String name, String email, String password)
+        {
+            
+        }
+
+    }
+
+    public class Professor : User
+    {
+        public Professor(String ID, String name, String email, String password)
+        {
+
+        }
+    }
+
+
+    public class Group
+    {
+        private String ID;
+        //private evaluations; Se debe hacer una Matrix
+    }
+
+    public class Evaluation
+    {
+        private String name;
+        private float points;
+        private float percentage;
+        private DateTime dueDate;
+        private String rubric;
+        private Boolean gradePublished;
+    }
+
+    public class EvaluationCategory
+    {
+        private String name;
+        private float percentage;
+    }
+
+    /*public class Entrega
+    {
+
+    }*/
+
+    public class Administrator
+    {
+
+    }
+
+
 }
