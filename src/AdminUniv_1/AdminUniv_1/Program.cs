@@ -151,18 +151,35 @@ namespace AdminUniv_1
 
 
     }
-
+    
+    
     public class Course
     {
         private String ID;
         private String name;
         private int credits;
+
+        public Course(String ID, String name, int credits)
+        {
+            this.ID = ID;
+            this.name = name;
+            this.credits = credits;
+        }
+
+
     }
 
     public class Carreer
     {
         private String ID;
         private String name;
+        
+        public Carreer(String ID, String name)
+        {
+            this.ID = ID;
+            this.name = name;
+        }
+
 
     }
 
@@ -190,8 +207,12 @@ namespace AdminUniv_1
 
     public class Student : User 
     {
+        public Student()
+        {
 
-        public Student(String ID, String name, String email, String password)
+        }
+
+        public Student(String ID, String name, String email, String password) : base(ID, name, email, password)
         {
             
         }
@@ -200,9 +221,13 @@ namespace AdminUniv_1
 
     public class Professor : User
     {
-        public Professor(String ID, String name, String email, String password)
+        public Professor()
         {
 
+        }
+        public Professor(String ID, String name, String email, String password) : base(ID, name, email, password)
+        {
+            
         }
     }
 
@@ -210,7 +235,13 @@ namespace AdminUniv_1
     public class Group
     {
         private String ID;
-        //private evaluations; Se debe hacer una Matrix
+        //private String evaluations; Se debe hacer una Matrix
+
+        public Group(String ID, String evaluations)
+        {
+            this.ID = ID;
+            this.evaluations = evaluations;
+        }
     }
 
     public class Evaluation
@@ -221,12 +252,30 @@ namespace AdminUniv_1
         private DateTime dueDate;
         private String rubric;
         private Boolean gradePublished;
+
+        public Evaluation(String name, float points, float percentage, DateTime dueDate, String rubric, Boolean gradePublished)
+        {
+            this.name = name;
+            this.points = points;
+            this.percentage = percentage;
+            this.dueDate = dueDate;
+            this.rubric = rubric;
+            this.gradePublished = gradePublished;
+        }
+
+
     }
 
     public class EvaluationCategory
     {
         private String name;
         private float percentage;
+
+        public EvaluationCategory(String name, float percentage)
+        {
+            this.name = name;
+            this.percentage = percentage;
+        }
     }
 
     /*public class Entrega
@@ -236,6 +285,8 @@ namespace AdminUniv_1
 
     public class Administrator
     {
+        public Administrator() { }
+
 
     }
 
