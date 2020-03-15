@@ -24,7 +24,7 @@ namespace AdminUniv_1
     }
 
 
-    public class DBManager
+    public class DBAccess
     {
         //Clase encargada de conectarse a la BD (MySQL) e interactuar con esta
 
@@ -33,21 +33,20 @@ namespace AdminUniv_1
 
         private static MySqlConnection conn;
         private static MySqlCommand cmd;
-        private static DBManager dbManager;
-        //private static CallableStatement callablestmt;
+        private static DBAccess dbAccess;
 
-        private DBManager()
+        private DBAccess()
         {
         }
 
-        public static DBManager getInstance()
+        public static DBAccess getInstance()
         {
-            if (dbManager == null)
+            if (dbAccess == null)
             {
-                dbManager = new DBManager();
+                dbAccess = new DBAccess();
                 connect();
             }
-            return dbManager;
+            return dbAccess;
         }
 
 
@@ -56,19 +55,20 @@ namespace AdminUniv_1
             return conn;
         }
 
-        /*public CallableStatement getStmt(String query)
+        public MySqlCommand procedureDB(String proc)
         {
             try
             {
-                callablestmt = conn.prepareCall(query);
-                return callablestmt;
+                MySqlCommand cmd = new MySqlCommand("proc", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                return cmd;
             }
             catch (Exception e)
             {
                 return null;
             }
 
-        }*/
+        }
 
         private static void connect()
         {
@@ -77,7 +77,7 @@ namespace AdminUniv_1
 
                 //Abre la conexión
                 //System.out.println("Conectando a la Base de Datos...");
-                DBManager.conn = new MySqlConnection("server = localhost; user id = root; database=tecvegetal; password=");
+                DBAccess.conn = new MySqlConnection("server = localhost; user id = root; database=tecvegetal; password=");
                 conn.Open();
 
             }
@@ -152,74 +152,84 @@ namespace AdminUniv_1
 
     }
     
-    
+    public enum TCourse {Teorico, Practico, TeoricoPractico, Laboratorio}
+
     public class Course
     {
-        private String ID;
-        private String name;
-        private int credits;
+        private String ID { get; set; }
+        private String name { get; set; }
+        private int credits { get; set; }
+        private TCourse typeCourse { get; set; }
 
-        public Course(String ID, String name, int credits)
+        public Course(String ID, String name, int credits, TCourse typeCourse)
         {
             this.ID = ID;
             this.name = name;
             this.credits = credits;
+            this.typeCourse = typeCourse;
         }
 
 
     }
+
+    public enum TGrade { Bachillerato, Licenciatura, Maestria, Doctorado}
 
     public class Carreer
     {
-        private String ID;
-        private String name;
-        
-        public Carreer(String ID, String name)
+        private String ID { get; set; }
+        private String name { get; set; }
+        private int duration { get; set; }
+        private TGrade typeGrade { get; set; }
+
+        public Carreer(String ID, String name, int duration, TGrade typeGrade)
         {
             this.ID = ID;
             this.name = name;
+            this.duration = duration;
+            this.typeGrade = typeGrade;
         }
 
 
     }
 
-    public abstract class User
+    public abstract class Person
     {
         protected String ID { get; set; }
         protected String name { get; set; }
         protected String email { get; set; }
         protected String password { get; set; }
-        protected ArrayList groups;
+        protected LinkedList<Group> groups { get; set; }
 
-        public User() { }
+        public Person() { }
 
-        public User(String ID, String name, String email, String password) {
+        public Person(String ID, String name, String email, String password) {
             this.ID = ID;
             this.name = name;
             this.email = email;
             this.password = password;
-            groups = new ArrayList();
+            groups = new LinkedList<Group>();
         }
 
 
 
     }
 
-    public class Student : User 
+    public class Student : Person 
     {
-        public Student()
+        private Carreer studentCarreer { get; set; }
+        public Student() : base()
         {
 
         }
 
-        public Student(String ID, String name, String email, String password) : base(ID, name, email, password)
+        public Student(String ID, String name, String email, String password, Carreer studentCarreer) : base(ID, name, email, password)
         {
-            
+            this.studentCarreer = studentCarreer;    
         }
 
     }
 
-    public class Professor : User
+    public class Professor : Person
     {
         public Professor()
         {
@@ -234,61 +244,92 @@ namespace AdminUniv_1
 
     public class Group
     {
-        private String ID;
-        //private String evaluations; Se debe hacer una Matrix
+        private String number { get; set; }
+        private Course courseData { get; set; }
+        private String schedule { get; set; }
+        private String classroom { get; set; }
+        private Professor professorData { get; set; }
+        private LinkedList<Student> studentList { get; set; }
+        private LinkedList<Handing> grades { get; set; }
 
-        public Group(String ID, String evaluations)
+        public Group(String number, Course courseData, String schedule, String classroom, Professor professorData, LinkedList<Student> studentList, LinkedList<Handing> grades)
         {
-            this.ID = ID;
-            this.evaluations = evaluations;
+            this.number = number;
+            this.courseData = courseData;
+            this.schedule = schedule;
+            this.classroom = classroom;
+            this.professorData = professorData;
+            this.studentList = studentList;
+        }
+
+        public Boolean addStudent(Student s)
+        {
+            try
+            {
+                studentList.AddLast(s);
+                return true;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public Boolean eliminateStudent(Student s)
+        {
+            try
+            {
+                studentList.Remove(s);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
         }
     }
 
     public class Evaluation
     {
-        private String name;
-        private float points;
-        private float percentage;
-        private DateTime dueDate;
-        private String rubric;
-        private Boolean gradePublished;
+        private String ID { get; set; }
+        private String description { get; set; }
+        private String instructions { get; set; }
+        private float percentage { get; set; }
+        private DateTime dueDate { get; set; }
+        private Boolean isPublished { get; set; }
 
-        public Evaluation(String name, float points, float percentage, DateTime dueDate, String rubric, Boolean gradePublished)
+        public Evaluation(String ID, String description, float percentage, DateTime dueDate, String instructions, Boolean isPublished)
         {
-            this.name = name;
-            this.points = points;
+            this.ID = ID;
+            this.description = description;
+            this.instructions = instructions;
             this.percentage = percentage;
             this.dueDate = dueDate;
-            this.rubric = rubric;
-            this.gradePublished = gradePublished;
+            this.isPublished = isPublished;
         }
 
 
     }
 
-    public class EvaluationCategory
-    {
-        private String name;
-        private float percentage;
+    public enum TEvaluationState { ATiempo, NoEntregada, Tardia, CalificadaSinPublicar, CalificadaPublicada}
 
-        public EvaluationCategory(String name, float percentage)
+    public class Handing
+    {
+        private DateTime handed { get; set; }
+        private float gradeObtained { get; set; }
+        private TEvaluationState state { get; set; }
+        private Student student { get; set; }
+        private Evaluation evaluation { get; set; }
+
+
+        public Handing(DateTime handed, float gradeObtained, TEvaluationState state, Student student, Evaluation evaluation)
         {
-            this.name = name;
-            this.percentage = percentage;
+            this.handed = handed;
+            this.gradeObtained = gradeObtained;
+            this.state = state;
+            this.student = student;
+            this.evaluation = evaluation;
         }
     }
-
-    /*public class Entrega
-    {
-
-    }*/
-
-    public class Administrator
-    {
-        public Administrator() { }
-
-
-    }
-
 
 }
