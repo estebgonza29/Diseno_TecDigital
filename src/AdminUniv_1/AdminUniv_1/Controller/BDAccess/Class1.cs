@@ -63,7 +63,7 @@ namespace AdminUniv_1.Controller.BDAccess
 
                 //Abre la conexión
                 //System.out.println("Conectando a la Base de Datos...");
-                connString = "server = localhost; user id = "+user+"; database=tecvegetal; password="+password;
+                connString = "server = localhost; user id = "+user+"; database=base_tec; password="+password;
                 DBAccessSingleton.conn = new MySqlConnection(connString);
                 conn.Open();
 
