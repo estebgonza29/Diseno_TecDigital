@@ -23,6 +23,8 @@ namespace AdminUniv_1.Controller.BDAccess
 
         private DBAccessSingleton() //Aqui se podrian inicializar el user y el password
         {
+            dbAccess = new DBAccessSingleton();
+            connect();
         }
 
         public static DBAccessSingleton getInstance()
