@@ -21,7 +21,7 @@ namespace AdminUniv_1.Controller.BDAccess
         private static MySqlCommand cmd;
         private static DBAccessSingleton dbAccess;
 
-        private DBAccessSingleton() //Aqui se podrian inicializar el user y el password
+        private DBAccessSingleton() //Aqui se podrian inicializar el user y el password de la BD
         {
             dbAccess = new DBAccessSingleton();
             connect();
@@ -63,8 +63,7 @@ namespace AdminUniv_1.Controller.BDAccess
             try
             {
 
-                //Abre la conexión
-                //System.out.println("Conectando a la Base de Datos...");
+                //Abre la conexión                
                 connString = "server = localhost; user id = " + user + "; database=base_tec; password=" + password;
                 DBAccessSingleton.conn = new MySqlConnection(connString);
                 conn.Open();
@@ -95,7 +94,7 @@ namespace AdminUniv_1.Controller.BDAccess
 
         public void disconnectDB()
         {
-            //finally block used to close resources
+            
             try
             {
                 if (cmd != null)
@@ -105,7 +104,7 @@ namespace AdminUniv_1.Controller.BDAccess
             }
             catch (MySqlException se)
             {
-            }// do nothing
+            }
             try
             {
                 if (conn != null)
@@ -116,61 +115,171 @@ namespace AdminUniv_1.Controller.BDAccess
             catch (MySqlException se)
             {
                 se.GetBaseException();
-            }//end finally try
+            }
         }
 
     }
 
     public class courseManager
-    {
+    {        
 
-        public Course get(String objectID)
+        public LinkedList<LinkedList<String>> getAll()
         {
-            MySqlCommand cmd;          
-            String strReturn;
+            MySqlCommand cmd;
+            LinkedList<LinkedList<String>> matrixCursos = new LinkedList<LinkedList<string>>();
+            LinkedList<String> strReturn = new LinkedList<string>(); ;
             try
             {
-                cmd = DBAccessSingleton.getInstance().procedureDB("getCourse");
-                cmd.Parameters.Add(new MySqlParameter("@CustomerID", objectID));
+                cmd = DBAccessSingleton.getInstance().procedureDB("listCursos");
                 using (MySqlDataReader rdr = cmd.ExecuteReader())
                 {
-                    // iterate through results, printing each to console
+                    // Se itera entre los resultados
                     while (rdr.Read())
-                    {
-                        strReturn = rdr["ProductName"] + " " + rdr["Total"];
+                    {                        
+                        strReturn.AddLast(rdr["id_curso"].ToString());
+                        strReturn.AddLast(rdr["nombre"].ToString());
+                        strReturn.AddLast(rdr["creditos"].ToString());
+                        matrixCursos.AddLast(strReturn);
+                        strReturn.Clear();
                     }
                 }
                 DBAccessSingleton.getInstance().disconnectDB();
+                return matrixCursos;                
             }
-            catch(Exception e)
+            catch (Exception e)
+            {
+                Console.WriteLine(e.InnerException);
+                return null;
+            }
+        }
+    }
+
+    public class groupManager
+    {
+        public LinkedList<LinkedList<String>> getTabla(String courseID, String groupID)
+        {            
+            MySqlCommand cmd;
+            LinkedList<LinkedList<String>> matrixTabla = new LinkedList<LinkedList<string>>();
+            LinkedList<String> listTabla = new LinkedList<String>();
+            try
+            {
+                cmd = DBAccessSingleton.getInstance().procedureDB("tabla");
+                cmd.Parameters.Add(new MySqlParameter("@id_curso", courseID));
+                cmd.Parameters.Add(new MySqlParameter("@id_grupo", groupID));
+                using (MySqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    // Se itera entre los resultados
+                    while (rdr.Read())
+                    {                        
+                        listTabla.AddLast(rdr["id_evaluacion"].ToString());
+                        listTabla.AddLast(rdr["descripcion"].ToString());
+                        foreach(String s in getEvaluations(courseID, groupID))
+                        {
+                            listTabla.AddLast(rdr[s].ToString());
+                        }                        
+                        matrixTabla.AddLast(listTabla);
+                        listTabla.Clear();
+                    }
+                }
+                DBAccessSingleton.getInstance().disconnectDB();
+                return matrixTabla;
+            }
+            catch (Exception e)
             {
                 Console.WriteLine(e.InnerException);
                 return null;
             }
         }
 
-        public LinkedList<Course> getAll()
+        public LinkedList<String> getAll()
         {
-
+            MySqlCommand cmd;
+            LinkedList<String> strReturn = new LinkedList<string>();
+            try
+            {
+                cmd = DBAccessSingleton.getInstance().procedureDB("listGrupos");
+                using (MySqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    // Se itera entre los resultados
+                    while (rdr.Read())
+                    {
+                        strReturn.AddLast(rdr["id_grupo"].ToString());
+                    }
+                }
+                DBAccessSingleton.getInstance().disconnectDB();
+                return strReturn;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.InnerException);
+                return null;
+            }
         }
-    }
-
-    public class groupManager
-    {
-        public Group get(String objectID)
+        public LinkedList<LinkedList<String>> getInfoCursoGrupo(String courseID, String groupID)
         {
-
+            MySqlCommand cmd;
+            LinkedList<LinkedList<String>> matrixCursoGrupo = new LinkedList<LinkedList<string>>();
+            LinkedList<String> listCursoGrupo = new LinkedList<String>();
+            try
+            {
+                cmd = DBAccessSingleton.getInstance().procedureDB("tabla");
+                cmd.Parameters.Add(new MySqlParameter("@id_curso", courseID));
+                cmd.Parameters.Add(new MySqlParameter("@id_grupo", groupID));
+                using (MySqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    // Se itera entre los resultados
+                    while (rdr.Read())
+                    {
+                        listCursoGrupo.AddLast(rdr["profesor"].ToString());
+                        listCursoGrupo.AddLast(rdr["horario"].ToString());
+                        listCursoGrupo.AddLast(rdr["aula"].ToString());
+                        listCursoGrupo.AddLast(rdr["creditos"].ToString());
+                        listCursoGrupo.AddLast(rdr["tipo_curso"].ToString());
+                        matrixCursoGrupo.AddLast(listCursoGrupo);
+                        listCursoGrupo.Clear();
+                    }
+                }
+                DBAccessSingleton.getInstance().disconnectDB();
+                return matrixCursoGrupo;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.InnerException);
+                return null;
+            }
         }
 
-        public LinkedList<Group> getAll()
+        public LinkedList<String> getEvaluations(String courseID, String groupID)
         {
-
+            MySqlCommand cmd;
+            LinkedList<String> strReturn = new LinkedList<string>();
+            try
+            {
+                cmd = DBAccessSingleton.getInstance().procedureDB("evaluaciones_cg");
+                cmd.Parameters.Add(new MySqlParameter("@id_curso", courseID));
+                cmd.Parameters.Add(new MySqlParameter("@id_grupo", groupID));
+                using (MySqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    // Se itera entre los resultados
+                    while (rdr.Read())
+                    {
+                        strReturn.AddLast(rdr["id_evaluacion"].ToString());
+                    }
+                }
+                DBAccessSingleton.getInstance().disconnectDB();
+                return strReturn;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.InnerException);
+                return null;
+            }
         }
-    }
+    }    
 
     public class professorManager
     {
-        public Professor get(String objectID)
+        /*public Professor get(String objectID)
         {
 
         }
@@ -178,12 +287,12 @@ namespace AdminUniv_1.Controller.BDAccess
         public LinkedList<Professor> getAll()
         {
 
-        }
+        }*/
     }
 
     public class studentManager
     {
-        public Student get(String objectID)
+        /*public Student get(String objectID)
         {
 
         }
@@ -191,12 +300,12 @@ namespace AdminUniv_1.Controller.BDAccess
         public LinkedList<Student> getAll()
         {
 
-        }
+        }*/
     }
 
     public class carreerManager
     {
-        public Carreer get(String objectID)
+        /*public Carreer get(String objectID)
         {
 
         }
@@ -204,12 +313,12 @@ namespace AdminUniv_1.Controller.BDAccess
         public LinkedList<Carreer> getAll()
         {
 
-        }
+        }*/
     }
 
     public class handingManager
     {
-        public Handing get(String objectID)
+        /*public Handing get(String objectID)
         {
 
         }
@@ -217,7 +326,7 @@ namespace AdminUniv_1.Controller.BDAccess
         public LinkedList<Handing> getAll()
         {
 
-        }
+        }*/
     }
 
 
