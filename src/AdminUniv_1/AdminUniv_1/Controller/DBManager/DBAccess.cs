@@ -122,31 +122,80 @@ namespace AdminUniv_1.Controller.BDAccess
     public class courseManager
     {
 
+        public Course get(String objectID)
+        {
+
+        }
+
+        public LinkedList<Course> getAll()
+        {
+
+        }
     }
 
     public class groupManager
     {
+        public Group get(String objectID)
+        {
 
+        }
+
+        public LinkedList<Group> getAll()
+        {
+
+        }
     }
 
     public class professorManager
     {
+        public Professor get(String objectID)
+        {
 
+        }
+
+        public LinkedList<Professor> getAll()
+        {
+
+        }
     }
 
     public class studentManager
     {
+        public Student get(String objectID)
+        {
 
+        }
+
+        public LinkedList<Student> getAll()
+        {
+
+        }
     }
 
     public class carreerManager
     {
+        public Carreer get(String objectID)
+        {
 
+        }
+
+        public LinkedList<Carreer> getAll()
+        {
+
+        }
     }
 
     public class handingManager
     {
+        public Handing get(String objectID)
+        {
 
+        }
+
+        public LinkedList<Handing> getAll()
+        {
+
+        }
     }
 
 
