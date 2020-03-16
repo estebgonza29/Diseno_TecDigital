@@ -126,7 +126,27 @@ namespace AdminUniv_1.Controller.BDAccess
 
         public Course get(String objectID)
         {
-
+            MySqlCommand cmd;          
+            String strReturn;
+            try
+            {
+                cmd = DBAccessSingleton.getInstance().procedureDB("getCourse");
+                cmd.Parameters.Add(new MySqlParameter("@CustomerID", objectID));
+                using (MySqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    // iterate through results, printing each to console
+                    while (rdr.Read())
+                    {
+                        strReturn = rdr["ProductName"] + " " + rdr["Total"];
+                    }
+                }
+                DBAccessSingleton.getInstance().disconnectDB();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.InnerException);
+                return null;
+            }
         }
 
         public LinkedList<Course> getAll()
