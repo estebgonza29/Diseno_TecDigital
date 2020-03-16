@@ -263,11 +263,42 @@ namespace AdminUniv_1.Controller.BDAccess
                     // Se itera entre los resultados
                     while (rdr.Read())
                     {
-                        strReturn.AddLast(rdr["id_evaluacion"].ToString());
+                        strReturn.AddLast(rdr["Evaluacion"].ToString());
                     }
                 }
                 DBAccessSingleton.getInstance().disconnectDB();
                 return strReturn;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.InnerException);
+                return null;
+            }
+        }
+
+        public LinkedList<LinkedList<String>> getEvaluationNames(String courseID, String groupID)
+        {
+            MySqlCommand cmd;
+            LinkedList<LinkedList<String>> matrixEvaluationNames = new LinkedList<LinkedList<string>>();
+            LinkedList<String> strReturn = new LinkedList<string>();
+            try
+            {
+                cmd = DBAccessSingleton.getInstance().procedureDB("evaluaciones_cg");
+                cmd.Parameters.Add(new MySqlParameter("@id_curso", courseID));
+                cmd.Parameters.Add(new MySqlParameter("@id_grupo", groupID));
+                using (MySqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    // Se itera entre los resultados
+                    while (rdr.Read())
+                    {
+                        strReturn.AddLast(rdr["Categoria"].ToString());
+                        strReturn.AddLast(rdr["Evaluacion"].ToString());
+                        matrixEvaluationNames.AddLast(strReturn);
+                        strReturn.Clear();
+                    }
+                }
+                DBAccessSingleton.getInstance().disconnectDB();
+                return matrixEvaluationNames;
             }
             catch (Exception e)
             {
